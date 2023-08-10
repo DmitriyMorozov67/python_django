@@ -20,21 +20,24 @@ class CountRequestsMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         self.requests_count = 0
-        self.request_time = {}
+        self.request_visitors = {}
         self.responses_count = 0
         self.exceptions_count = 0
 
     def __call__(self, request: HttpRequest):
         time_delay = 10
-        if not self.request_time:
-            print('The first request after restarting the server. The dictionary is empty!')
+        visitor_ip = request.META.get('REMOTE_ADDR')
+
+        if visitor_ip not in self.request_visitors:
+            self.request_visitors[visitor_ip] = round(time.time() * 1)
         else:
-            if (round(time.time()) * 1) - self.request_time['time'] < time_delay \
-                    and self.request_time['ip_address'] == request.META.get('REMOTE_ADDR'):
-                print("It's been less than 10 seconds since the last request from your IP-address")
+            if round(time.time() * 1) - self.request_visitors[visitor_ip] < time_delay \
+                    and request.META.get('REMOTE_ADDR') in self.request_visitors:
+                print('Request times are too frequent. Repeat after 10 seconds!')
                 return render(request, 'requestdataapp/error-request.html')
 
-        self.request_time = {'time': round(time.time()) * 1, 'ip_address': request.META.get('REMOTE_ADDR')}
+        self.request_visitors[visitor_ip] = round(time.time() * 1)
+
         self.requests_count += 1
         print("requests count", self.requests_count)
         response = self.get_response(request)

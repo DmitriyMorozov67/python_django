@@ -22,11 +22,10 @@ def handel_file_upload(request: HttpRequest) -> HttpResponse:
         myfile = request.FILES["myfile"]
         fs = FileSystemStorage()
         filename = fs.save(myfile.name, myfile)
-        file_size = fs.size(filename)
-        if file_size > 1048576:
-            fs.delete(filename)
-            print('file is deleted:', filename)
+        if filename.size < 1048576:
+            print("saved file", filename)
             return render(request, "requestdataapp/error-message.html")
         else:
-            print("saved file", filename)
+            return render(request, "requestdataapp/error-message.html")
+
     return render(request, "requestdataapp/file-upload.html")
