@@ -17,6 +17,7 @@ def set_useragent_on_request_middleware(get_response):
     return middleware
 
 class CountRequestsMiddleware:
+
     def __init__(self, get_response):
         self.get_response = get_response
         self.requests_count = 0
@@ -25,6 +26,7 @@ class CountRequestsMiddleware:
         self.exceptions_count = 0
 
     def __call__(self, request: HttpRequest):
+        # Не понял как реализовать отдельный счётчик на индивидуальное количество запросов
         time_delay = 0.5
         visitor_ip = request.META.get('REMOTE_ADDR')
 
