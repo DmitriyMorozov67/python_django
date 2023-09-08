@@ -22,6 +22,7 @@ class CountRequestsMiddleware:
         self.get_response = get_response
         self.requests_count = 0
         self.request_visitors = {}
+        self.count_vizitor = 0
         self.responses_count = 0
         self.exceptions_count = 0
 
@@ -32,11 +33,15 @@ class CountRequestsMiddleware:
 
         if visitor_ip not in self.request_visitors:
             self.request_visitors[visitor_ip] = round(time.time() * 1)
+        elif visitor_ip in self.request_visitors and round(time.time() * 1) - self.request_visitors[visitor_ip] < time_delay:
+            self.count_vizitor += 1
         else:
             if round(time.time() * 1) - self.request_visitors[visitor_ip] < time_delay \
-                    and request.META.get('REMOTE_ADDR') in self.request_visitors:
+                    and request.META.get('REMOTE_ADDR') in self.request_visitors and self.count_vizitor > 2:
                 print('Request times are too frequent. Repeat after 1 second!')
+                self.count_vizitor = 0
                 return render(request, 'requestdataapp/error-request.html')
+
 
         self.request_visitors[visitor_ip] = round(time.time() * 1)
 

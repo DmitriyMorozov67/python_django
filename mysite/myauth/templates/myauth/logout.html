@@ -1,0 +1,15 @@
+{% extends 'myauth/base.html' %}
+
+{% block title %}
+    Logout
+{% endblock %}
+
+{% block body %}
+    <h1>You have logged out of your account, log in to continue</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <a href="{% url 'myauth:login' %}">Login</a>
+        </div>
+    </form>
+{% endblock %}
