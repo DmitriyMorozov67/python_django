@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+
+
 class Product(models.Model):
     class Meta:
         ordering = ["name", "price"]
         #db_table = "tech_products"
         #verbose_name_plural = "products"
-
 
 
     name = models.CharField(max_length=100)
@@ -15,6 +16,7 @@ class Product(models.Model):
     discount = models.SmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     archived = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, default=1, on_delete=models.CASCADE)
 
     #@property
     #def description_short(self) -> str:
