@@ -74,7 +74,7 @@ class ProductUpdateView(UpdateView, UserPassesTestMixin):
         product = self.get_object()
         return self.request.user.is_superuser or (
                 self.request.user == product.created_by
-                and self.request.user.has_perm('shopapp.change_product')
+                or self.request.user.has_perm('shopapp.change_product')
         )
 
     def get_success_url(self):
