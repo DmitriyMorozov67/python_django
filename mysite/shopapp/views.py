@@ -52,8 +52,8 @@ class ProductsListView(ListView):
     #model = Product
     context_object_name = "products"
     queryset = Product.objects.filter(archived=False)
-class ProductCreateView(UserPassesTestMixin, CreateView):
-
+class ProductCreateView(PermissionRequiredMixin, CreateView):
+    permission_required = 'shopapp.add_product'
     model = Product
     fields = "name", "price", "description", "discount", "created_by"
     success_url = reverse_lazy("shopapp:products_list")
@@ -62,32 +62,33 @@ class ProductCreateView(UserPassesTestMixin, CreateView):
         form.instance.create_by = self.request.user
         return super().form_valid(form)
 
-    def test_func(self):
-        return self.request.user.has_perm('shopapp.add_product')
 
 
 
-@method_decorator(login_required, name='dispatch')
-@method_decorator(user_passes_test(lambda u: u.is_superuser or u.has_perm('shopapp.change_product')), name='dispatch')
-class ProductUpdateView(UpdateView):
+
+class ProductUpdateView(UpdateView, UserPassesTestMixin):
     model = Product
     fields = "name", "price", "description", "discount", "created_by"
     template_name_suffix = "_update_form"
+    def test_func(self):
+        product = self.get_object()
+        return self.request.user.is_superuser or (
+                self.request.user == product.created_by
+                and self.request.user.has_perm('shopapp.change_product')
+        )
 
     def get_success_url(self):
         return reverse(
-            "shopapp:product_details",
-            kwargs={"pk": self.object.pk},
+                "shopapp:product_details",
+                kwargs={"pk": self.object.pk},
         )
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if not self.request.user.is_superuser:
-            queryset = queryset.filter(created_by=self.request.user)
+    def dispatch(self, request, *args, **kwargs):
+        if not self.test_func():
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
 
-        if not queryset.filter(pk=self.kwargs['pk'], created_by=self.request.user).exists():
-            raise Http404("You do not have access to this product.")
-        return queryset
+
 
 class ProductDeleteView(DeleteView):
     model = Product
