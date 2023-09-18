@@ -1,0 +1,93 @@
+[
+  {
+    "model": "shopapp.product",
+    "pk": 1,
+    "fields": {
+      "name": "Laptop",
+      "description": "Ноутбук Apple MacBook Air",
+      "price": "1999.00",
+      "discount": 0,
+      "created_at": "2023-07-20T15:01:02.243Z",
+      "archived": true,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 2,
+    "fields": {
+      "name": "Desktop (new)",
+      "description": "",
+      "price": "2399.00",
+      "discount": 15,
+      "created_at": "2023-07-20T15:01:02.243Z",
+      "archived": false,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 3,
+    "fields": {
+      "name": "Smartphone",
+      "description": "У iPhone 14 Pro 6,1--дюймовая панель. Пиковая яркость — 2000 нит. Используется небольшой вырез с датчиком фронтальной камеры и системой Face ID. Кроме того, он способен визуально уменьшаться и увеличиваться. Предусмотрен режим Always-on Display (экран всегда включен).\r\nАппаратная основа — A16 Bionic. Это 4-нм SoC с производительным GPU и дополнительным процессором Image Signal Proccessor для повышения качества снимков.\r\nТыльная камера iPhone 14 Pro тройная, на 48, 12 и 12 Мп. Ночью iPhone 14 Pro снимает в два раза лучше, чем iPhone 13 Pro. Селфи-камера на 12 Мп.",
+      "price": "987.00",
+      "discount": 25,
+      "created_at": "2023-07-20T15:01:02.243Z",
+      "archived": false,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 4,
+    "fields": {
+      "name": "Tablet",
+      "description": "great tablet",
+      "price": "1234.00",
+      "discount": 0,
+      "created_at": "2023-08-11T16:18:52.709Z",
+      "archived": false,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 5,
+    "fields": {
+      "name": "Phone2",
+      "description": "phone 2 is better than phone 1\r\nthis is great phone!",
+      "price": "12345.00",
+      "discount": 0,
+      "created_at": "2023-08-15T09:40:17.206Z",
+      "archived": false,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 6,
+    "fields": {
+      "name": "Phone 3",
+      "description": "phone 3",
+      "price": "999.42",
+      "discount": 12,
+      "created_at": "2023-08-15T10:23:47.182Z",
+      "archived": true,
+      "created_by": 1
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 7,
+    "fields": {
+      "name": "Tablet 2",
+      "description": "a new tablet",
+      "price": "1500.00",
+      "discount": 15,
+      "created_at": "2023-08-15T10:27:03.989Z",
+      "archived": false,
+      "created_by": 1
+    }
+  }
+]

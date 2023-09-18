@@ -1,0 +1,82 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$ZeoHVl1Qz1UIaOJtH7DRot$M173lLQXh2PDqhzEacSXhnhfdFso978yakrFZg1jKEo=",
+      "last_login": "2023-09-13T11:13:03.350Z",
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "John",
+      "last_name": "",
+      "email": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2023-07-18T11:03:43Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$ksy7qhzItlv9Q0plrhZjGW$7OVWzwUEliqtuqDya6Sac/v6PJQuOkp2UXMBiW6c7a8=",
+      "last_login": "2023-09-13T11:09:20.947Z",
+      "is_superuser": false,
+      "username": "samael",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2023-09-09T13:15:25Z",
+      "groups": [],
+      "user_permissions": [
+        4,
+        25
+      ]
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$XSUiauc44ehAYwIBn6Txt8$hRts2Kw4GEjDN5p1Ald4EpKXUKFTdzPwhlEDiWnfyHM=",
+      "last_login": "2023-09-13T10:40:59.886Z",
+      "is_superuser": false,
+      "username": "john",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2023-09-09T13:44:28Z",
+      "groups": [],
+      "user_permissions": [
+        32
+      ]
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$BGUThVuKEeEGIiIJEvBi0p$wOk8uF5Xt5k8R5IArRmiaUdh++dx5ZQwO2nfRItsQ20=",
+      "last_login": "2023-09-13T11:11:36.871Z",
+      "is_superuser": false,
+      "username": "nick",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2023-09-09T14:01:10Z",
+      "groups": [],
+      "user_permissions": [
+        4,
+        36
+      ]
+    }
+  }
+]

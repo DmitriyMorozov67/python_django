@@ -3,7 +3,7 @@ from timeit import default_timer
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, Http404, JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -134,3 +134,36 @@ class OrderUpdateForm(UpdateView):
 class OrderDeleteView(DeleteView):
     model = Order
     success_url = reverse_lazy("shopapp:order_list")
+
+class ProductsDataExportView(View):
+    def get(self, request: HttpRequest) -> JsonResponse:
+        products = Product.objects.order_by("pk").all()
+        products_data = [
+            {
+                "pk": product.pk,
+                "name": product.name,
+                "price": product.price,
+                "archived": product.archived,
+            }
+            for product in products
+        ]
+        return JsonResponse({"products": products_data})
+
+class OrdersExportView(UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get(self, request):
+        orders = Order.objects.all()
+        orders_data = [
+            {
+                "order_id": order.id,
+                "delivery_address": order.delivery_address,
+                "promocode": order.promocode,
+                "user_id": order.user.id,
+                "product_ids": [product.id for product in order.products.all()]
+            }
+            for order in orders
+        ]
+
+        return JsonResponse({'orders': orders_data})
