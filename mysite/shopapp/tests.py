@@ -19,7 +19,25 @@ class AddTwoNumbersTestCase(TestCase):
 
 
 class ProductCreateViewTestCase(TestCase):
+    fixtures = [
+        "products-fixture.json",
+        "users-fixture.json",
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username="bob", password="qwerty")
+        permission_add_product = Permission.objects.get(codename="add_product")
+        cls.user.user_permissions.add(permission_add_product)
+        cls.user.save()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.user.delete()
+
     def setUp(self) -> None:
+        self.client.force_login(self.user)
         self.product_name = "".join(choices(ascii_letters, k=10))
         Product.objects.filter(name=self.product_name).delete()
 
@@ -44,8 +62,13 @@ class ProductCreateViewTestCase(TestCase):
 
 
 class ProductDetailsViewTestCase(TestCase):
+    fixtures = [
+        "products-fixture.json",
+        "users-fixture.json",
+    ]
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         cls.product = Product.objects.create(name="Best Product")
 
     @classmethod
@@ -54,13 +77,13 @@ class ProductDetailsViewTestCase(TestCase):
 
     def get_product(self):
         response = self.client.get(
-            reverse("shopapp:product_details", kwargs={"pk": self.product.pk})
+            reverse("shopapp:product_details", kwargs={"pk": self.product.pk}, HTTP_USER_AGENT="Mozilla/5.0")
         )
         self.assertEqual(response.status_code, 200)
 
     def get_product_and_check_content(self):
         response = self.client.get(
-            reverse("shopapp:product_details", kwargs={"pk": self.product.pk})
+            reverse("shopapp:product_details", kwargs={"pk": self.product.pk}, HTTP_USER_AGENT="Mozilla/5.0")
         )
         self.assertContains(response, self.product.name)
 
@@ -68,6 +91,7 @@ class ProductDetailsViewTestCase(TestCase):
 class ProductsListViewTestCase(TestCase):
     fixtures = [
         'products-fixture.json',
+        "users-fixture.json",
     ]
 
     def test_products(self):
@@ -81,6 +105,7 @@ class ProductsListViewTestCase(TestCase):
 
 
 class OrdersListViewTestCase(TestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.user = User.objects.create_user(username="bob", password="qwerty")
@@ -106,6 +131,7 @@ class OrdersListViewTestCase(TestCase):
 class ProductsExportViewTestCase(TestCase):
     fixtures = [
         "products-fixture.json",
+        "users-fixture.json",
     ]
 
     def test_get_product_view(self):
@@ -113,6 +139,7 @@ class ProductsExportViewTestCase(TestCase):
             reverse("shopapp:products-export"),
             HTTP_USER_AGENT="Mozilla/5.0",
         )
+
         self.assertEqual(response.status_code, 200)
         products = Product.objects.order_by("pk").all()
         expected_data = [
@@ -195,15 +222,15 @@ class OrdersExportTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         orders = Order.objects.all()
         expected_data = [
-                {
-                    'order_id': order.id,
-                    'delivery_address': order.delivery_address,
-                    'promocode': order.promocode,
-                    'user_id': order.user_id,
-                    'product_ids': [product.pk for product in order.products.all()],
-                }
-                for order in orders
-            ]
+            {
+                'order_id': order.id,
+                'delivery_address': order.delivery_address,
+                'promocode': order.promocode,
+                'user_id': order.user_id,
+                'product_ids': [product.pk for product in order.products.all()],
+            }
+            for order in orders
+        ]
 
         orders_data = response.json()
         self.assertEqual(orders_data['orders'], expected_data)

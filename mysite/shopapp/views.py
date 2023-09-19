@@ -14,6 +14,7 @@ from .forms import GroupForm
 from .forms_model import ProductForm, OrderForm
 from .models import Product, Order
 
+
 class ShopIndexView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         products = [
@@ -26,6 +27,7 @@ class ShopIndexView(View):
             "products": products,
         }
         return render(request, 'shopapp/shop-index.html', context=context)
+
 
 class GroupsListView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
@@ -43,15 +45,20 @@ class GroupsListView(View):
 
         return redirect(request.path)
 
+
 class ProductDetailsView(DetailView):
     template_name = "shopapp/product-details.html"
     model = Product
     context_object_name = "product"
+
+
 class ProductsListView(ListView):
     template_name = "shopapp/products-list.html"
-    #model = Product
+    # model = Product
     context_object_name = "products"
     queryset = Product.objects.filter(archived=False)
+
+
 class ProductCreateView(PermissionRequiredMixin, CreateView):
     permission_required = 'shopapp.add_product'
     model = Product
@@ -63,13 +70,11 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-
-
-
 class ProductUpdateView(UpdateView, UserPassesTestMixin):
     model = Product
     fields = "name", "price", "description", "discount", "created_by"
     template_name_suffix = "_update_form"
+
     def test_func(self):
         product = self.get_object()
         return self.request.user.is_superuser or (
@@ -79,15 +84,14 @@ class ProductUpdateView(UpdateView, UserPassesTestMixin):
 
     def get_success_url(self):
         return reverse(
-                "shopapp:product_details",
-                kwargs={"pk": self.object.pk},
+            "shopapp:product_details",
+            kwargs={"pk": self.object.pk},
         )
 
     def dispatch(self, request, *args, **kwargs):
         if not self.test_func():
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
-
 
 
 class ProductDeleteView(DeleteView):
@@ -108,6 +112,7 @@ class OrdersListView(LoginRequiredMixin, ListView):
         .prefetch_related("products")
     )
 
+
 class OrderDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "shopapp.view_order"
     queryset = (
@@ -116,24 +121,29 @@ class OrderDetailView(PermissionRequiredMixin, DetailView):
         .prefetch_related("products")
     )
 
+
 class CreateOrderView(CreateView):
     model = Order
     fields = "user", "delivery_address", "promocode", "products"
     success_url = reverse_lazy("shopapp:order_list")
 
+
 class OrderUpdateForm(UpdateView):
     model = Order
     fields = "user", "delivery_address", "promocode", "products"
     template_name_suffix = "_update_form"
+
     def get_success_url(self):
         return reverse(
-           "shopapp:order_details",
+            "shopapp:order_details",
             kwargs={"pk": self.object.pk}
         )
+
 
 class OrderDeleteView(DeleteView):
     model = Order
     success_url = reverse_lazy("shopapp:order_list")
+
 
 class ProductsDataExportView(View):
     def get(self, request: HttpRequest) -> JsonResponse:
@@ -148,6 +158,7 @@ class ProductsDataExportView(View):
             for product in products
         ]
         return JsonResponse({"products": products_data})
+
 
 class OrdersExportView(UserPassesTestMixin, View):
     def test_func(self):
