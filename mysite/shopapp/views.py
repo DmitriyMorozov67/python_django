@@ -11,7 +11,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from .forms import GroupForm, ProductForm, OrderForm
-#from .forms_model import ProductForm, OrderForm
+# from .forms_model import ProductForm, OrderForm
 from .models import Product, Order, ProductImage
 
 
@@ -48,7 +48,7 @@ class GroupsListView(View):
 
 class ProductDetailsView(DetailView):
     template_name = "shopapp/product-details.html"
-    #model = Product
+    # model = Product
     queryset = Product.objects.prefetch_related("images")
     context_object_name = "product"
 
@@ -63,7 +63,7 @@ class ProductsListView(ListView):
 class ProductCreateView(PermissionRequiredMixin, CreateView):
     permission_required = 'shopapp.add_product'
     model = Product
-    #fields = "name", "price", "description", "discount", "preview"
+    # fields = "name", "price", "description", "discount", "preview"
     success_url = reverse_lazy("shopapp:products_list")
     form_class = ProductForm
 
@@ -80,7 +80,7 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
 
 class ProductUpdateView(UpdateView, UserPassesTestMixin):
     model = Product
-    #fields = "name", "price", "description", "discount"
+    # fields = "name", "price", "description", "discount"
     template_name_suffix = "_update_form"
     form_class = ProductForm
 
