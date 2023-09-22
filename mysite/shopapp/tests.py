@@ -7,8 +7,8 @@ from django.contrib.auth.models import User, Permission
 from django.test import TestCase
 from django.urls import reverse
 
-from shopapp.models import Product, Order
-from shopapp.utils import add_two_numbers
+from .models import Product, Order
+from .utils import add_two_numbers
 
 
 # Create your tests here.
@@ -57,7 +57,7 @@ class ProductCreateViewTestCase(TestCase):
 
         self.assertRedirects(response, reverse("shopapp:products_list"))
         self.assertTrue(
-            Product.objecs.filter(name=self.product_name).exists()
+            Product.objects.filter(name=self.product_name).exists()
         )
 
 
@@ -66,6 +66,7 @@ class ProductDetailsViewTestCase(TestCase):
         "products-fixture.json",
         "users-fixture.json",
     ]
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
