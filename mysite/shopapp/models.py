@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 def product_preview_directory_path(instance: "Product", filename: str) -> str:
-    return "products.product_{pk}/preview/{filename}".format(
+    return "products/product_{pk}/preview/{filename}".format(
         pk=instance.pk,
         filename=filename,
     )
@@ -42,7 +42,7 @@ def product_images_directory_path(instance: "ProductImage", filename: str) -> st
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to=product_images_directory_path)
+    image = models.ImageField(null=True, upload_to=product_images_directory_path)
     description = models.CharField(max_length=200, null=False, blank=True)
 
 

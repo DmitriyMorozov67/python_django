@@ -1,15 +1,36 @@
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse, reverse_lazy
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, UpdateView, ListView, DetailView
 from .models import Profile
 from django.views import View
+
 class AboutMeView(TemplateView):
     template_name = "myauth/about-me.html"
+    model = User
+    context_object_name = "user"
+
+class AboutMeUpdateView(UserPassesTestMixin, UpdateView):
+    model = Profile
+    template_name_suffix = "_update_form"
+    fields = "username", "name", "last_name", "email", "bio", "avatar"
+
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.pk == self.get_object().user.pk
+
+    def get_success_url(self):
+        return reverse(
+            "myauth:about-me",
+             kwargs={"pk":self.object.pk}
+        )
+
+
 
 class RegisterView(CreateView):
     form_class = UserCreationForm
@@ -52,6 +73,15 @@ def logout_view(request: HttpRequest):
 
 class MyLogoutView(LogoutView):
     next_page = reverse_lazy("myauth:logout")
+class UserProfile(DetailView):
+    template_name = "myauth/user-profile.html"
+    queryset = User.objects
+    context_object_name = "user"
+class UsersList(ListView):
+    template_name = 'myauth/users.html'
+    context_object_name = "users"
+    queryset = User.objects.all()
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def set_cookie_view(request: HttpRequest) -> HttpResponse:

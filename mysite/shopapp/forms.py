@@ -1,6 +1,5 @@
 from django.forms import ModelForm
 from django.contrib.auth.models import Group
-from django.core.validators import validate_image_file_extension
 from django import forms
 
 from .models import Product, Order

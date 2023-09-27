@@ -7,14 +7,24 @@
 {% block body %}
     <h1>User info</h1>
     {% if user.is_authenticated %}
-        <h2>Detail</h2>
-        <p>Username: {{ user.username }}</p>
+        <h2>Details</h2>
+        <p>Username: {{  user.username }}</p>
         <p>First name: {{ user.first_name }}</p>
         <p>Last name: {{ user.last_name }}</p>
         <p>Email: {{ user.email }}</p>
         <p>Bio: {{ user.bio }}</p>
+        <h3>Avatar:</h3>
+        {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="{{ user.avatar.name }}">
+        {% else %}
+            <p>No avatar available</p>
+        {% endif %}
+        {% if request.user.is_staff or request.user.pk == user.pk %}
+            <div>
+                <a href="{% url 'myauth:about-update' pk=user.pk %}">Update</a>
+            </div>
+        {% endif %}
     {% else %}
         <h2>User is anonymous</h2>
     {% endif %}
-
 {% endblock %}
