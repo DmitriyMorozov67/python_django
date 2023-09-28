@@ -11,11 +11,13 @@ from django.views.generic import TemplateView, CreateView, UpdateView, ListView,
 from .models import Profile
 from django.views import View
 
-class AboutMeView(TemplateView):
-    template_name = "myauth/about-me.html"
-    model = User
-    context_object_name = "user"
+class AboutMeView(UpdateView):
+    model = Profile
+    fields = "avatar",
+    success_url = "myauth/about-me"
 
+    def get_object(self, queryset=None):
+        return self.request.user
 class AboutMeUpdateView(UserPassesTestMixin, UpdateView):
     model = Profile
     template_name_suffix = "_update_form"
