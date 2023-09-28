@@ -10,27 +10,52 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import TemplateView, CreateView, UpdateView, ListView, DetailView
 from .models import Profile
 from django.views import View
+from .forms import UserForm
 
-class AboutMeView(UpdateView):
+class AboutMeView(UpdateView, UserPassesTestMixin):
     model = Profile
     fields = "avatar",
-    success_url = "myauth/about-me"
+    template_name = "myauth/about-me.html"
+    #template_name_suffix = "_update_form"
+    success_url = reverse_lazy("myauth:about-me")
+    #form_class = UserForm
 
     def get_object(self, queryset=None):
         return self.request.user
-class AboutMeUpdateView(UserPassesTestMixin, UpdateView):
-    model = Profile
-    template_name_suffix = "_update_form"
-    fields = "username", "name", "last_name", "email", "bio", "avatar"
 
     def test_func(self):
         return self.request.user.is_staff or self.request.user.pk == self.get_object().user.pk
 
-    def get_success_url(self):
-        return reverse(
-            "myauth:about-me",
-             kwargs={"pk":self.object.pk}
-        )
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        for avatr in form.files.getlist("avatar"):
+            ProductImage.objects.create(
+                product=self.object,
+                image=avatr,
+            )
+        return response
+
+# class AboutMeUpdateView(UserPassesTestMixin, UpdateView):
+#     model = Profile
+#     template_name_suffix = "_update_form"
+#     fields = "username", "name", "last_name", "email", "bio", "avatar"
+#
+#     def test_func(self):
+#         return self.request.user.is_staff or self.request.user.pk == self.get_object().user.pk
+#
+#     def get_success_url(self):
+#         return reverse(
+#             "myauth:about-me",
+#              kwargs={"pk":self.object.pk}
+#         )
 
 
 

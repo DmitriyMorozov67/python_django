@@ -13,7 +13,7 @@ from .views import (
     FooBarView,
     UsersList,
     UserProfile,
-    AboutMeUpdateView
+    #AboutMeUpdateView
 
 )
 
@@ -31,7 +31,7 @@ urlpatterns = [
     path("logout/", MyLogoutView.as_view(template_name="myauth/logout.html"), name="logout"),
     path("cookie/get/", get_cookie_view, name="cookie-get"),
     path("about-me/", AboutMeView.as_view(), name="about-me"),
-    path("about-me/update<int:pk>", AboutMeUpdateView.as_view(), name="about-update"),
+    # path("about-me/update<int:pk>", AboutMeView.as_view(), name="about-update"),
     path("register/", RegisterView.as_view(), name="resister"),
     path("cookie/set/", set_cookie_view, name="cookie-set"),
     path("session/set/", set_session_view, name="session-set"),
