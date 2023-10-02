@@ -12,51 +12,18 @@ from .models import Profile
 from django.views import View
 from .forms import UserForm
 
+
 class AboutMeView(UpdateView, UserPassesTestMixin):
     model = Profile
     fields = "avatar",
     template_name = "myauth/about-me.html"
-    #template_name_suffix = "_update_form"
     success_url = reverse_lazy("myauth:about-me")
-    #form_class = UserForm
 
     def get_object(self, queryset=None):
-        return self.request.user
+        return self.request.user.profile
 
     def test_func(self):
         return self.request.user.is_staff or self.request.user.pk == self.get_object().user.pk
-
-    def post(self, request, *args, **kwargs):
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        for avatr in form.files.getlist("avatar"):
-            ProductImage.objects.create(
-                product=self.object,
-                image=avatr,
-            )
-        return response
-
-# class AboutMeUpdateView(UserPassesTestMixin, UpdateView):
-#     model = Profile
-#     template_name_suffix = "_update_form"
-#     fields = "username", "name", "last_name", "email", "bio", "avatar"
-#
-#     def test_func(self):
-#         return self.request.user.is_staff or self.request.user.pk == self.get_object().user.pk
-#
-#     def get_success_url(self):
-#         return reverse(
-#             "myauth:about-me",
-#              kwargs={"pk":self.object.pk}
-#         )
-
 
 
 class RegisterView(CreateView):
@@ -77,6 +44,8 @@ class RegisterView(CreateView):
         login(request=self.request, user=user)
 
         return response
+
+
 def login_view(request: HttpRequest) -> HttpResponse:
     if request.method == 'GET':
         if request.user.is_authenticated:
@@ -94,16 +63,22 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
     return render(request, 'myauth/login.html', {"error": "Invalid login credentials"})
 
+
 def logout_view(request: HttpRequest):
     logout(request)
     return redirect(reverse("myauth:login"))
 
+
 class MyLogoutView(LogoutView):
     next_page = reverse_lazy("myauth:logout")
+
+
 class UserProfile(DetailView):
     template_name = "myauth/user-profile.html"
     queryset = User.objects
     context_object_name = "user"
+
+
 class UsersList(ListView):
     template_name = 'myauth/users.html'
     context_object_name = "users"
@@ -116,19 +91,23 @@ def set_cookie_view(request: HttpRequest) -> HttpResponse:
     response.set_cookie("fizz", "buzz", max_age=3600)
     return response
 
+
 def get_cookie_view(request: HttpRequest) -> HttpResponse:
     value = request.COOKIES.get("fizz", "default value")
     return HttpResponse(f"Cookie value: {value!r}")
+
 
 @permission_required("myauth.view_profile", raise_exception=True)
 def set_session_view(request: HttpRequest) -> HttpResponse:
     request.session["foobar"] = "spameggs"
     return HttpResponse("Session set!")
 
+
 @login_required
 def get_session_view(request: HttpRequest) -> HttpResponse:
     value = request.session.get("foobar", "default")
     return HttpResponse(f"Session value: {value!r}")
+
 
 class FooBarView(View):
     def get(self, request: HttpRequest) -> JsonResponse:

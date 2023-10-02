@@ -20,8 +20,8 @@
                 <p>Email: {{ user.email }}</p>
                 <p>Bio: {{ user.bio }}</p>
                 <h3>Avatar:</h3>
-                {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="{{ user.avatar.name }}">
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.profile.avatar.name }}">
                 {% else %}
                     <p>No avatar available</p>
                 {% endif %}
