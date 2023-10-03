@@ -13,6 +13,7 @@ from .views import (
     FooBarView,
     UsersList,
     UserProfile,
+    HelloView,
 
 )
 
@@ -27,6 +28,7 @@ urlpatterns = [
         ),
         name="login",
     ),
+    path("hello/", HelloView.as_view(), name="hello"),
     path("logout/", MyLogoutView.as_view(template_name="myauth/logout.html"), name="logout"),
     path("cookie/get/", get_cookie_view, name="cookie-get"),
     path("about-me/", AboutMeView.as_view(), name="about-me"),

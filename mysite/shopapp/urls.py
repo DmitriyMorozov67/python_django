@@ -12,7 +12,6 @@ from .views import (
     ProductDeleteView,
     OrderUpdateForm,
     OrderDeleteView,
-    #create_order,
     ProductsDataExportView,
     OrdersExportView,
 )
