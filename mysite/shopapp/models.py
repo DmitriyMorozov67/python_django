@@ -59,4 +59,4 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="orders")
     products = models.ManyToManyField(Product, related_name="orders")
-    receipt = models.FileField(null=True, upload_to='orders/receipt/')
+    receipt = models.FileField(null=True, blank=True, upload_to='orders/receipt/')

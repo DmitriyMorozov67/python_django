@@ -56,8 +56,6 @@ msgid "Orders"
 msgstr "Заказы"
 
 #: .\shopapp\templates\shopapp\product-details.html:6
-#, fuzzy
-#| msgid "Product"
 msgid "Product #"
 msgstr "Товар"
 
