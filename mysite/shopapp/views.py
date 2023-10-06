@@ -1,26 +1,50 @@
+"""
+В этом модуле лежат различные наборы представлений.
+
+Разные view интернет-магазина: по товарам, заказам и т.д.
+"""
+
 from timeit import default_timer
 
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import Group, User
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, Http404, JsonResponse
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.contrib.auth.models import Group
+from django.http import (
+    HttpResponse,
+    HttpRequest,
+    HttpResponseRedirect,
+    JsonResponse
+)
+from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView
+)
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin
+)
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
-from .forms import GroupForm, ProductForm, OrderForm
-# from .forms_model import ProductForm, OrderForm
+from .forms import GroupForm, ProductForm
 from .models import Product, Order, ProductImage
 from .serializers import ProductSerializer, OrderSerializer
 
-
+@extend_schema(description="Product views CRUD")
 class ProductViewSet(ModelViewSet):
+    """
+    Набор представлений для действий над Product.
+
+    Полный CRUD для сущностей товара.
+    """
+
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [
@@ -42,7 +66,27 @@ class ProductViewSet(ModelViewSet):
         "discount",
     ]
 
+    @extend_schema(
+        summary="Get one product by ID",
+        description="Retrieves **product**, returns 404 if not found",
+        responses={
+            200: ProductSerializer,
+            404: OpenApiResponse(
+                description="Empty response, product by id not found"
+            ),
+        }
+    )
+    def retrieve(self, *args, **kwargs):
+        return super().retrieve(*args, **kwargs)
+
+
 class OrderViewSet(ModelViewSet):
+    """
+    Набор представлений для действий над Order.
+
+    Полный CRUD для сущностей заказа.
+    """
+
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     filter_backends = [
@@ -61,7 +105,14 @@ class OrderViewSet(ModelViewSet):
         "products",
     ]
 
+
 class ShopIndexView(View):
+    """
+    Набор представлений для действий над ShopIndex.
+
+    Вывод приветсвия и информации.
+    """
+
     def get(self, request: HttpRequest) -> HttpResponse:
         products = [
             ('laptop', 1999),
