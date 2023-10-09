@@ -1,0 +1,23 @@
+{% extends 'blogapp/base.html' %}
+
+{% block title %}
+  Article list
+{% endblock %}
+
+{% block body %}
+  <h1>Article:</h1>
+  {% if articles %}
+      {% for article in articles %}
+        <h3>Article # {{ article.id }}</h3>
+        <p>Title: {{ article.title }}</p>
+        <p>Date published: {{ article.pub_date }}</p>
+        <p>Author: {{ article.author.name }}</p>
+        <p>Category: {{ article.category.name }}</p>
+        <p>Tags: {{ article.tags.name }}</p>
+      {% endfor %}
+  {% else %}
+    <p>There is not a single article</p>
+  {% endif %}
+
+
+{% endblock %}
