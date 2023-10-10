@@ -13,7 +13,11 @@
         <p>Date published: {{ article.pub_date }}</p>
         <p>Author: {{ article.author.name }}</p>
         <p>Category: {{ article.category.name }}</p>
-        <p>Tags: {{ article.tags.name }}</p>
+        <div>
+          {% for tag in article.tags.all %}
+            <li> {{ tag.name }} </li>
+          {% endfor %}
+        </div>
       {% endfor %}
   {% else %}
     <p>There is not a single article</p>

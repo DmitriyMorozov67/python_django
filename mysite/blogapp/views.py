@@ -8,4 +8,5 @@ class ClassBasedView(ListView):
         Article.objects
         .select_related("author")
         .prefetch_related("tags")
+        .defer("content")
     )
