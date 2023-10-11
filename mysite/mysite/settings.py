@@ -11,9 +11,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
 from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _a
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://7c7498c6b53d203e9b79b1453d11d303@o4506030677164032.ingest.sentry.io/4506030711111680",
+    traces_sample_rate=1.0,
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,6 +40,7 @@ ALLOWED_HOSTS = [
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
 if DEBUG:
     import socket
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
@@ -42,7 +48,6 @@ if DEBUG:
     INTERNAL_IPS.extend(
         [ip[: ip.rfind(".")] + ".1" for ip in ips]
     )
-
 
 # Application definition
 
@@ -164,8 +169,8 @@ LOCALE_PATHS = [
 ]
 
 LANGUAGES = [
-    ('en', _('English')),
-    ('ru', _('Russian')),
+    ('en', _a('English')),
+    ('ru', _a('Russian')),
 ]
 
 # Static files (CSS, JavaScript, Images)
