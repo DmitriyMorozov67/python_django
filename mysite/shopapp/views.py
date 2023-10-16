@@ -7,17 +7,20 @@ import logging
 from timeit import default_timer
 from csv import DictWriter
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.contrib.syndication.views import Feed
+from django.core.serializers import serialize
 from django.http import (
     HttpResponse,
     HttpRequest,
     HttpResponseRedirect,
-    JsonResponse
+    JsonResponse, Http404
 )
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.views import View
+from django.views.decorators.cache import cache_page
 from django.views.generic import (
     ListView,
     DetailView,
@@ -38,6 +41,7 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
+from django.utils.decorators import method_decorator
 
 from .common import save_csv_products, save_csv_orders
 from .forms import GroupForm, ProductForm
@@ -74,6 +78,12 @@ class ProductViewSet(ModelViewSet):
         "price",
         "discount",
     ]
+
+    @method_decorator(cache_page(60 * 2))
+    def list(self, *args, **kwargs):
+        # print("Hello products list")
+        return super().list(*args, **kwargs)
+
     @action(methods=["get"], detail=False)
     def download_csv(self, request: Request):
 
@@ -210,6 +220,7 @@ class ShopIndexView(View):
     Вывод приветсвия и информации.
     """
 
+    # @method_decorator(cache_page(60 * 2))
     def get(self, request: HttpRequest) -> HttpResponse:
         products = [
             ('laptop', 1999),
@@ -223,6 +234,7 @@ class ShopIndexView(View):
         }
         log.debug("Products for shop index: %s", products)
         log.info("Rendering shop index")
+        print("shop index context", context)
         return render(request, 'shopapp/shop-index.html', context=context)
 
 
@@ -370,19 +382,23 @@ class OrderDeleteView(DeleteView):
 
 class ProductsDataExportView(View):
     def get(self, request: HttpRequest) -> JsonResponse:
-        products = Product.objects.order_by("pk").all()
-        products_data = [
-            {
-                "pk": product.pk,
-                "name": product.name,
-                "price": product.price,
-                "archived": product.archived,
-            }
-            for product in products
-        ]
-        elem = products_data[0]
-        name = elem["name"]
-        print("name:", name)
+        cache_key = "products_data_export"
+        products_data = cache.get(cache_key)
+        if products_data is None:
+            products = Product.objects.order_by("pk").all()
+            products_data = [
+                {
+                    "pk": product.pk,
+                    "name": product.name,
+                    "price": product.price,
+                    "archived": product.archived,
+                }
+                for product in products
+            ]
+            cache.set(cache_key, products_data, 300)
+            elem = products_data[0]
+            name = elem["name"]
+            print("name:", name)
         return JsonResponse({"products": products_data})
 
 
@@ -426,3 +442,43 @@ class LatestProductsFeed(Feed):
 
     def item_description(self, item: Product):
         return item.description[:200]
+
+class UserOrdersListView(ListView, LoginRequiredMixin):
+    model = Order
+    template_name = "shopapp/user-orders.html"
+    context_object_name = "user-orders"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            raise Http404("User not found")
+        return super().dispatch(request, *args, **kwargs)
+    def get_queryset(self):
+        user_id = self.kwargs.get("user_id")
+        self.owner = get_object_or_404(User, pk=user_id)
+        return Order.objects.select_related("user").prefetch_related("products").filter(user=self.owner)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.owner:
+            context['user'] = self.owner
+        return context
+
+    def get_user_id(self, request):
+        self.owner = self.request.user
+        return self.owner
+
+class UserOrdersExportView(View):
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        cache_key = f"user_orders_export_{user_id}"
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return JsonResponse(cached_data)
+
+        orders = Order.objects.filter(user=user).order_by("pk").all()
+        serializer = OrderSerializer(orders, many=True)
+        data = serializer.data
+
+        cache.set(cache_key, data, 300)
+        return JsonResponse(data, safe=False)

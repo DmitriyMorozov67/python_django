@@ -17,7 +17,10 @@ from .views import (
     ProductsDataExportView,
     OrdersExportView,
     ProductViewSet,
-    OrderViewSet, LatestProductsFeed,
+    OrderViewSet,
+    LatestProductsFeed,
+    UserOrdersListView,
+    UserOrdersExportView
 )
 
 app_name = "shopapp"
@@ -27,6 +30,7 @@ routers.register("products", ProductViewSet)
 routers.register("orders", OrderViewSet)
 
 urlpatterns = [
+    # path("", cache_page(60 * 3)(ShopIndexView.as_view()), name="index"),
     path("", ShopIndexView.as_view(), name="index"),
     path("api/", include(routers.urls)),
     path("groups/", GroupsListView.as_view(), name="groups_list"),
@@ -43,4 +47,6 @@ urlpatterns = [
     path("orders/create", CreateOrderView.as_view(), name="order_create"),
     path("orders/<int:pk>/delete/", OrderDeleteView.as_view(), name="order_delete"),
     path("orders/export/", OrdersExportView.as_view(), name="orders-export"),
+    path("users/<int:user_id>/orders/",UserOrdersListView.as_view(), name="user_orders"),
+    path("users/<int:user_id>/orders/export/", UserOrdersExportView.as_view(), name="user_orders_export"),
 ]
